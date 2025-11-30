@@ -1,4 +1,3 @@
-# multi-domain-intelligence-platform
 # 🛡️ Multi-Domain Cyber Intelligence Platform  
 ### CST1510 — Week 8 to Week 10 Full Project
 
@@ -116,5 +115,4 @@ Shows understanding of how the system can grow into a real-world architecture.
 
 ---
 
-# 🔗 How All Folders Work Together
 
