@@ -2,9 +2,8 @@ import streamlit as st
 import pandas as pd
 from app_backend.incidents import get_all_incidents
 
-# -----------------------------
 # Page & Style Setup
-# -----------------------------
+
 st.set_page_config(
     page_title="Cyber Threat Dashboard",
     page_icon="🧬",
@@ -29,15 +28,13 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# -----------------------------
 # Dashboard Header
-# -----------------------------
+
 st.title("🧬 Cyber Threat Intelligence Dashboard")
 st.caption(f"Analyst logged in: {st.session_state.username}")
 
-# -----------------------------
 # Load Incident Data
-# -----------------------------
+
 try:
     incidents = get_all_incidents()
     incidents["date_reported"] = pd.to_datetime(incidents["date_reported"], errors="coerce")
@@ -45,9 +42,8 @@ except Exception as e:
     st.error(f"Unable to load database data: {e}")
     st.stop()
 
-# -----------------------------
 # Sidebar Filtering
-# -----------------------------
+
 with st.sidebar:
     st.header("Filters")
 
@@ -74,9 +70,8 @@ if isinstance(date_range, tuple) and len(date_range) == 2:
     start, end = pd.to_datetime(date_range[0]), pd.to_datetime(date_range[1])
     df = df[(df["date_reported"] >= start) & (df["date_reported"] <= end)]
 
-# -----------------------------
 # KPI Metrics
-# -----------------------------
+
 total = len(df)
 open_cases = (df["status"] == "Open").sum()
 critical = (df["severity"].isin(["High", "Critical"])).sum()
@@ -88,9 +83,8 @@ col3.metric("High Severity", critical)
 
 st.divider()
 
-# -----------------------------
 # Charts
-# -----------------------------
+
 colA, colB = st.columns(2)
 
 with colA:
@@ -104,15 +98,13 @@ with colB:
 
 st.divider()
 
-# -----------------------------
 # Table
-# -----------------------------
+
 with st.expander("🗄 Raw Incident Data"):
     st.dataframe(df, use_container_width=True)
 
-# -----------------------------
 # Logout
-# -----------------------------
+
 if st.button("Log out"):
     st.session_state.logged_in = False
     st.session_state.username = ""

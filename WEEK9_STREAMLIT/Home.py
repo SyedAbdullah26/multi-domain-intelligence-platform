@@ -1,27 +1,24 @@
 import streamlit as st
 from app_backend.users import register_user, login_user
 
-# -----------------------------
 # Page Setup
-# -----------------------------
+
 st.set_page_config(
     page_title="Cyber Login Portal",
     page_icon="🔐",
     layout="centered"
 )
 
-# -----------------------------
 # Session State Initialization
-# -----------------------------
+
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
 if "username" not in st.session_state:
     st.session_state.username = ""
 
-# -----------------------------
 # Cyber-Themed Styling
-# -----------------------------
+
 st.markdown("""
 <style>
     .stApp {
@@ -67,9 +64,8 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# -----------------------------
 # UI Header
-# -----------------------------
+
 st.title("🔐 Cyber Intelligence Access Portal")
 st.caption("Authorized Analysts Only. Access is monitored.")
 
@@ -80,14 +76,12 @@ if st.session_state.logged_in:
         st.switch_page("pages/1_Dashboard.py")
     st.stop()
 
-# -----------------------------
 # Tabs for Login / Register
-# -----------------------------
+
 tab_login, tab_register = st.tabs(["Login", "Register"])
 
-# -----------------------------
 # Login Tab
-# -----------------------------
+
 with tab_login:
     st.subheader("Log in to your analyst account")
 
@@ -104,9 +98,9 @@ with tab_login:
         else:
             st.error(message)
 
-# -----------------------------
+
 # Register Tab
-# -----------------------------
+
 with tab_register:
     st.subheader("Create a new analyst account")
 
