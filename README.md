@@ -6,12 +6,6 @@ The system is divided into three main parts: a backend (Week 8), a Streamlit use
 
 ---
 
-# 📁 Folder Structure Explained
-
-This section explains **exactly what each folder holds** and **why it exists**.
-
----
-
 ## 📁 WEEK08_BACKEND — Backend + Database Layer
 
 This folder contains the **core logic** of the entire system.
