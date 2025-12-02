@@ -1,112 +1,184 @@
 import streamlit as st
 import pandas as pd
-from app_backend.incidents import get_all_incidents
+import random
+from app_backend.theme import apply_cyber_theme, render_sidebar
+from app_backend.incidents import load_incidents
+from app_backend.tickets import load_tickets
+from app_backend.datasets import load_datasets
 
-# Page & Style Setup
+st.set_page_config(page_title="Dashboard", page_icon="📊", layout="wide")
 
-st.set_page_config(
-    page_title="Cyber Threat Dashboard",
-    page_icon="🧬",
-    layout="wide"
-)
+apply_cyber_theme()
+render_sidebar()
 
-# Ensure user is logged in
 if "logged_in" not in st.session_state or not st.session_state.logged_in:
-    st.error("You must log in to access the dashboard.")
-    if st.button("Back to Login"):
-        st.switch_page("Home.py")
+    st.error("Please log in first.")
     st.stop()
 
-# Cyber styling
+role = st.session_state.get("role", "analyst")
+
+# ================== HEADER ==================
 st.markdown("""
-<style>
-    .stApp {
-        background-color: #02040a;
-        color: #00ff9d;
-        font-family: "Consolas", "Fira Code", monospace;
-    }
-</style>
+<div class="header-bar">
+  <div><strong>Future Icon SOC • Live Threat Overview</strong></div>
+  <div class="terminal-typing">
+    Ingesting cyber incidents, IT tickets and dataset signals in real time...
+  </div>
+</div>
 """, unsafe_allow_html=True)
 
-# Dashboard Header
+st.title("📊 Cyber Intelligence Dashboard")
 
-st.title("🧬 Cyber Threat Intelligence Dashboard")
-st.caption(f"Analyst logged in: {st.session_state.username}")
+# ================== LOAD DATA ==================
+inc = load_incidents()
+tickets = load_tickets()
+datasets = load_datasets()
 
-# Load Incident Data
+# ================== KPI METRICS ==================
+c1, c2, c3 = st.columns(3)
+c1.metric("Total Incidents", len(inc))
+c2.metric("Total Tickets", len(tickets))
+c3.metric("Datasets", len(datasets))
 
-try:
-    incidents = get_all_incidents()
-    incidents["date_reported"] = pd.to_datetime(incidents["date_reported"], errors="coerce")
-except Exception as e:
-    st.error(f"Unable to load database data: {e}")
-    st.stop()
+high_critical = inc[inc["severity"].isin(["High", "Critical"])].shape[0] if "severity" in inc.columns else 0
+open_tickets = tickets[tickets["status"] == "Open"].shape[0] if "status" in tickets.columns else 0
 
-# Sidebar Filtering
-
-with st.sidebar:
-    st.header("Filters")
-
-    severities = ["All"] + sorted(incidents["severity"].dropna().unique().tolist())
-    selected_sev = st.selectbox("Severity", severities)
-
-    statuses = ["All"] + sorted(incidents["status"].dropna().unique().tolist())
-    selected_status = st.selectbox("Status", statuses)
-
-    # Date filtering
-    min_d, max_d = incidents["date_reported"].min(), incidents["date_reported"].max()
-    date_range = st.date_input("Date Range", (min_d, max_d))
-
-# Apply filters
-df = incidents.copy()
-
-if selected_sev != "All":
-    df = df[df["severity"] == selected_sev]
-
-if selected_status != "All":
-    df = df[df["status"] == selected_status]
-
-if isinstance(date_range, tuple) and len(date_range) == 2:
-    start, end = pd.to_datetime(date_range[0]), pd.to_datetime(date_range[1])
-    df = df[(df["date_reported"] >= start) & (df["date_reported"] <= end)]
-
-# KPI Metrics
-
-total = len(df)
-open_cases = (df["status"] == "Open").sum()
-critical = (df["severity"].isin(["High", "Critical"])).sum()
-
-col1, col2, col3 = st.columns(3)
-col1.metric("Total Incidents", total)
-col2.metric("Open Incidents", open_cases)
-col3.metric("High Severity", critical)
+if high_critical > 0:
+    st.error(f"🚨 {high_critical} High/Critical incidents require attention.")
+if open_tickets > 0:
+    st.warning(f"📥 {open_tickets} IT tickets are still open.")
 
 st.divider()
 
-# Charts
+# ================== HUD / HOLOGRAM SECTION ==================
+st.subheader("🛰 Holographic System HUD")
 
-colA, colB = st.columns(2)
+h1, h2, h3 = st.columns(3)
+with h1:
+    st.markdown("""
+    <div class="hud-circle">
+        <div class="hud-label">
+            <b>Incidents</b><br/>
+            Realtime<br/>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-with colA:
-    st.subheader("📊 Severity Breakdown")
-    st.bar_chart(df["severity"].value_counts())
+with h2:
+    st.markdown("""
+    <div class="hud-circle">
+        <div class="hud-label">
+            <b>Tickets</b><br/>
+            Support load<br/>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-with colB:
-    st.subheader("📈 Incidents Over Time")
-    trend = df.set_index("date_reported").resample("D").size()
-    st.line_chart(trend)
+with h3:
+    st.markdown("""
+    <div class="hud-circle">
+        <div class="hud-label">
+            <b>Datasets</b><br/>
+            Intelligence feeds<br/>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 st.divider()
 
-# Table
+# ================== NETWORK GRAPH ==================
+st.subheader("🌐 Network Graph (Logical View)")
 
-with st.expander("🗄 Raw Incident Data"):
-    st.dataframe(df, use_container_width=True)
+graph_dot = """
+digraph G {
+  rankdir=LR;
+  node [shape=circle, style=filled, color="#00ff9d", fontcolor="black"];
+  Internet -> Firewall;
+  Firewall -> WebGateway;
+  Firewall -> AppServer;
+  AppServer -> Database;
+  WebGateway -> Users;
+}
+"""
 
-# Logout
+st.graphviz_chart(graph_dot)
 
-if st.button("Log out"):
-    st.session_state.logged_in = False
-    st.session_state.username = ""
-    st.success("You have been logged out.")
-    st.switch_page("Home.py")
+st.divider()
+
+# ================== RADAR SCANNER + MAP ==================
+col_radar, col_map = st.columns(2)
+
+with col_radar:
+    st.subheader("📡 Radar Scanner")
+    st.markdown("""
+    <div class="radar-wrapper">
+      <div class="radar-grid"></div>
+      <div class="radar-beam"></div>
+    </div>
+    """, unsafe_allow_html=True)
+    st.caption("Rotating radar visual to show scanning activity (decorative).")
+
+with col_map:
+    st.subheader("🗺 Global SOC Nodes (Sample)")
+    map_df = pd.DataFrame(
+        [
+            {"lat": 25.276987, "lon": 55.296249},  # Dubai
+            {"lat": 51.507351, "lon": -0.127758},  # London
+            {"lat": 40.712776, "lon": -74.005974}, # New York
+            {"lat": 35.689487, "lon": 139.691711}, # Tokyo
+        ]
+    )
+    st.map(map_df, zoom=1)
+
+st.divider()
+
+# ================== THREAT FEED ==================
+st.subheader("⚡ Real-Time Threat Feed (Simulated)")
+
+threat_types = ["Phishing", "Ransomware", "DDoS", "Bruteforce", "Data Exfiltration"]
+regions = ["EMEA", "APAC", "NA", "LATAM"]
+assets = ["Email Gateway", "Web Server", "Database Cluster", "VPN Gateway", "User Endpoint"]
+
+def generate_fake_threats(n=6):
+    rows = []
+    for _ in range(n):
+        t = random.choice(threat_types)
+        r = random.choice(regions)
+        a = random.choice(assets)
+        sev = random.choice(["Low", "Medium", "High", "Critical"])
+        rows.append(f"- [{sev}] {t} targeting **{a}** in **{r}**")
+    return rows
+
+if st.button("🔄 Refresh Threat Feed"):
+    st.session_state.threat_feed = generate_fake_threats()
+
+feed = st.session_state.get("threat_feed") or generate_fake_threats()
+for line in feed:
+    st.markdown(line)
+
+st.divider()
+
+# ================== BASIC ANALYTICS ==================
+st.subheader("📈 Incident & Ticket Analytics")
+
+a1, a2 = st.columns(2)
+with a1:
+    st.markdown("**Incidents by Severity**")
+    if "severity" in inc.columns and not inc.empty:
+        st.bar_chart(inc["severity"].value_counts())
+    else:
+        st.info("No severity data available.")
+
+with a2:
+    st.markdown("**Tickets by Status**")
+    if "status" in tickets.columns and not tickets.empty:
+        st.bar_chart(tickets["status"].value_counts())
+    else:
+        st.info("No ticket status data available.")
+
+if role == "admin":
+    st.subheader("📊 Datasets by Source (Admin Only)")
+    if "source" in datasets.columns and not datasets.empty:
+        st.bar_chart(datasets["source"].value_counts())
+    else:
+        st.info("No dataset source data available.")
