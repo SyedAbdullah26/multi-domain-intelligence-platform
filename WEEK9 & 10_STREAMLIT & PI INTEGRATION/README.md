@@ -1,56 +1,121 @@
-# 🛡️ Week 09 — Cyber Intelligence Platform (Streamlit UI)
+# 🛡️ Week 09 & 10 — Cyber Intelligence Platform (Streamlit + AI Assistant)
 
-This folder contains the **Week 09 Streamlit-based graphical interface** for the Multi-Domain Intelligence Platform.  
-
-The goal of this week is to build a functional user interface that connects directly to the **Week 08 SQLite database**, uses real incident data, and demonstrates interactive visual analytics using Streamlit.
-
-To make the interface more engaging and realistic for a cybersecurity environment, I implemented a **modern cyber-SOC themed UI** (dark mode + neon green), while still following all workshop requirements such as:
-
-- session state  
-- login + register  
-- multiple Streamlit pages  
-- charts, tables, filters, forms  
-- widgets shown in the workshop templates  
-- multi-page routing structure and sidebar usage  
-
-Every advanced feature is built *on top of* the same techniques demonstrated in the workshop sessions.
+This project combines **Week 09** (Streamlit UI) and **Week 10** (AI Assistant Upgrade) into one full **Cyber Intelligence SOC Portal**.  
+It connects to the Week 08 SQLite database, visualizes cyber data, and now includes a **smart AI chatbot** powered by **Google Gemini** to help users understand incidents, tickets, and datasets.
 
 ---
 
-## 🎯 Key Features Implemented This Week
+## 🎯 Project Objective Timeline
 
-### 🔐 **1. Full Authentication System**
-- Login and Register pages using tabs  
-- Password verification via Week 08 backend  
-- Session handling with `st.session_state`  
-- Access restriction for secured pages  
+| Week | Focus | Result |
+|------|-------|--------|
+| **Week 09** | Build Streamlit UI with database connection | Fully functional SOC dashboard with forms, analytics, and multi-page structure |
+| **Week 10** | Add an AI Chatbot using Gemini API | Smart SOC Assistant that can answer anything and interpret portal data |
 
-### 🧬 **2. Cyber-Themed SOC Dashboard**
-- Real data from Week 08 (`cyber_incidents` table)  
-- Severity breakdown bar chart  
-- Time-series line graph of incidents  
-- KPI metrics (total incidents, open cases, high severity)  
-- Complex interactive filters:  
-  - Severity  
-  - Status  
-  - Date range  
-- Raw data table using `st.dataframe()`  
-- Styling using injected CSS for a neon green hacker feel  
+---
 
-### 📝 **3. Incident Management**
-- “View Incidents” tab showing all incidents from DB  
-- “Add New Incident” form:  
-  - Date  
-  - Type  
-  - Severity  
-  - Status  
-  - Description  
-- Automatically linked to Week 08’s `insert_incident()`  
-- Auto-refresh after insertion  
+## 🧬 Features Implemented
 
-### 🗂️ **4. Multi-Page Structure**
-This app uses Streamlit’s built-in multi-page system with separate pages for:
-- Dashboard  
-- Incident Management  
-- User Authentication  
-- Settings / Profile  
+### 🔐 **1️⃣ Authentication System**
+- Login & Register pages (tabs)
+- Password hashing via backend
+- Session state to keep users logged in
+- Role support: `analyst` / `admin`
+- Page access restrictions
+
+---
+
+### 📊 **2️⃣ Cyber-SOC Dashboard**
+- Real incidents, tickets & dataset metrics
+- KPI counters for overview
+- **Charts:**
+  - Incidents by severity
+  - Tickets by status
+  - Dataset sources (admin-only)
+- Global map with SOC node locations
+- Live threat-feed generator
+- Network architecture graph (Graphviz)
+- Animated hologram + radar scanner visuals
+
+> UI styling fully customized with neon green **cyberpunk SOC theme**
+
+---
+
+### 🛡️ **3️⃣ Incident Management Page**
+- **View all incidents** from database
+- **Add new incident**
+  - Date
+  - Type
+  - Severity
+  - Status
+  - Description
+- Stored instantly in SQLite DB
+
+---
+
+### 🎫 **4️⃣ IT Ticket Overview**
+- Displays all IT tickets
+- Ticket metrics:
+  - Open tickets count
+  - High-priority tickets
+- Visual analytics with bar charts
+
+---
+
+### 📚 **5️⃣ Dataset Metadata Page**
+- Shows metadata table from DB
+- Charts for:
+  - Sources distribution
+  - Record counts per dataset
+- KPIs for datasets & total records
+
+---
+
+### 👤 **6️⃣ User Profile Page**
+- Displays username + role
+- Logout button resets session state
+
+---
+
+## 🤖 Week 10 Upgrade — AI SOC Assistant
+
+A **Gemini-powered chatbot** that:
+### 🧠 Understands the User
+- Greets using **logged-in username**
+- Friendly, balanced tone
+- Remembers user interests during conversation
+
+### 🔍 Uses Real SOC Data Intelligently
+If the user asks about:
+- incidents  
+- severity  
+- attacks  
+- tickets  
+- priority  
+- datasets  
+
+→ The AI **summarizes real values** from the database and explains them clearly  
+(never makes up numbers)
+
+### 🗣️ General Knowledge + Cyber Knowledge
+- Can explain tech concepts  
+- Can talk about music, life, gaming, business  
+- Acts like a helpful, smart friend
+
+---
+
+## 🧠 Tech Stack
+
+| Component | Technology |
+|----------|------------|
+| UI Framework | Streamlit |
+| AI Assistant | Google Gemini API |
+| Database | SQLite (from Week 08) |
+| Data Processing | Pandas |
+| Graphics | Graphviz, Streamlit Charts |
+| Styling | Custom CSS (Neon Cyber Theme) |
+
+---
+
+## 📂 Project Structure
+
