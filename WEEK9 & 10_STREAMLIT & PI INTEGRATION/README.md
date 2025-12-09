@@ -117,5 +117,3 @@ If the user asks about:
 
 ---
 
-## 📂 Project Structure
-
